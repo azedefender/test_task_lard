@@ -1,39 +1,56 @@
+// Ждем, пока документ полностью загрузится
 $(document).ready(function() {
+    // Перехватываем событие отправки формы с идентификатором 'registrationForm'
     $('#registrationForm').on('submit', function(e) {
+        // Предотвращаем стандартное поведение формы (перезагрузку страницы)
         e.preventDefault();
         
-        // Валидация на клиентской стороне
+        // Инициализируем переменную для проверки валидности формы
         let valid = true;
+        // Очищаем предыдущие сообщения об ошибках
         $('#message').empty();
 
+        // Проверяем, заполнено ли поле с названием компании
         if ($('#companyName').val() === '') {
-            valid = false;
+            valid = false; // Устанавливаем валидность в false
+            // Добавляем сообщение об ошибке
             $('#message').append('<p>Название компании обязательно.</p>');
         }
+        // Проверяем, соответствует ли ИНН формату (10 или 12 цифр)
         if (!/^\d{10}$|^\d{12}$/.test($('#inn').val())) {
-            valid = false;
+            valid = false; // Устанавливаем валидность в false
+            // Добавляем сообщение об ошибке
             $('#message').append('<p>ИНН должен быть 10 или 12 цифр.</p>');
         }
+        // Проверяем, начинается ли телефон с 11 и состоит ли из 11 цифр
         if (!/^11\d{10}$/.test($('#phone').val())) {
-            valid = false;
+            valid = false; // Устанавливаем валидность в false
+            // Добавляем сообщение об ошибке
             $('#message').append('<p>Телефон должен начинаться с 11 и содержать 11 цифр.</p>');
         }
+        // Проверяем, соответствует ли email правильному формату
         if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test($('#email').val())) {
-            valid = false;
+            valid = false; // Устанавливаем валидность в false
+            // Добавляем сообщение об ошибке
             $('#message').append('<p>Неправильный формат email.</p>');
         }
-
+        
+        // Если все проверки пройдены (valid == true)
         if (valid) {
+            // Отправляем данные формы на сервер с помощью AJAX
             $.ajax({
-                type: 'POST',
-                url: 'process.php',
-                data: $(this).serialize(),
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
+                type: 'POST', // Метод отправки
+                url: 'process.php', // URL для обработки данных
+                data: $(this).serialize(), // Сериализуем данные формы
+                dataType: 'json', // Ожидаемый тип данных от сервера
+                success: function(response) { // Функция, вызываемая при успешном ответе
+                    if (response.success) { // Если ответ успешный
+                        // Выводим сообщение от сервера
                         $('#message').append('<p>' + response.message + '</p>');
+                        // Загружаем зарегистрированные юридические лица
                         loadRegisteredEntities();
-                    } else {
+                    } else { // Если есть ошибки в ответе
+                        // Перебираем массив ошибок и выводим их
                         response.errors.forEach(function(error) {
                             $('#message').append('<p>' + error + '</p>');
                         });
@@ -43,21 +60,27 @@ $(document).ready(function() {
         }
     });
 
+    // Функция для загрузки зарегистрированных юридических лиц
     function loadRegisteredEntities() {
+        // Отправляем GET-запрос на сервер
         $.ajax({
-            url: 'process.php',
-            type: 'GET',
-            dataType: 'json',
-            success: function(data) {
+            url: 'process.php', // URL для получения данных
+            type: 'GET', // Метод запроса
+            dataType: 'json', // Ожидаемый тип данных от сервера
+            success: function(data) { // Функция, вызываемая при успешном ответе
+                // Создаем таблицу для отображения данных
                 let html = '<table><tr><th>Название компании</th><th>ИНН</th><th>Телефон</th><th>Email</th></tr>';
+                // Перебираем полученные данные и добавляем строки в таблицу
                 data.forEach(function(entity) {
                     html += '<tr><td>' + entity.company_name + '</td><td>' + entity.inn + '</td><td>' + entity.phone + '</td><td>' + entity.email + '</td></tr>';
                 });
-                html += '</table>';
+                html += '</table>'; // Закрываем таблицу
+                // Вставляем таблицу в элемент с идентификатором 'registeredEntities'
                 $('#registeredEntities').html(html);
             }
         });
     }
 
-    loadRegisteredEntities(); // Загрузить зарегистрированные юридические лица при загрузке страницы
+    // Вызываем функцию для загрузки зарегистрированных юридических лиц при загрузке страницы
+    loadRegisteredEntities(); 
 });
