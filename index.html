@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация юридического лица</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Регистрация юридического лица</h1>
+    <form id="registrationForm">
+        <label for="companyName">Название компании:</label>
+        <input type="text" id="companyName" name="companyName" required>
+
+        <label for="inn">ИНН:</label>
+        <input type="text" id="inn" name="inn" required>
+
+        <label for="phone">Телефон:</label>
+        <input type="text" id="phone" name="phone" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+
+        <button type="submit">Зарегистрировать</button>
+    </form>
+
+    <div id="message"></div>
+    <div id="registeredEntities"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
